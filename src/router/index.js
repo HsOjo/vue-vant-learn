@@ -1,8 +1,10 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-import Home from '../views/Home.vue'
-import Login from '@/views/user/Login'
+const originalPush = VueRouter.prototype.push;
+VueRouter.prototype.push = function(location) {
+  return originalPush.call(this, location).catch(err => err)
+}
 
 Vue.use(VueRouter)
 
@@ -10,21 +12,44 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home
-  },
-  {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    component: () => import('@/views/Home'),
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/home/Index'),
+      },
+      {
+        path: 'categories',
+        component: () => import('@/views/home/Category'),
+      },
+      {
+        path: 'category/:id',
+        component: () => import('@/views/home/Category'),
+      },
+      {
+        path: 'search',
+        component: () => import('@/views/home/Search'),
+      },
+      {
+        path: 'shopping-cart',
+        component: () => import('@/views/home/ShoppingCart'),
+      },
+      {
+        path: 'my',
+        component: () => import('@/views/home/My'),
+      },
+    ]
   },
   {
     path: '/user/login',
     name: 'Login',
-    component: Login
-  }
+    component: () => import('@/views/user/Login')
+  },
+  {
+    path: '/commodity/:id',
+    name: 'Commodity',
+    component: () => import('@/views/Commodity')
+  },
 ]
 
 const router = new VueRouter({
